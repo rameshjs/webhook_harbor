@@ -46,7 +46,8 @@
 			<ul role="list" class="divide-y divide-gray-200 dark:divide-gray-700">
 				{% for workspace in workspaces %}
 				<a href="{% url 'workspace' id=workspace.session_id %}">
-					<li class="py-3 sm:py-4 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+					<li
+						class="mb-2 py-3 sm:py-4 rounded {% if workspace.session_id == workspace_id %} bg-gray-100 dark:bg-gray-600 {% else %} hover:bg-gray-100 dark:hover:bg-gray-700 {% endif %}">
 						<div class="flex items-center">
 							<div class="flex-1 min-w-0 ms-4">
 								<p class="text-sm font-medium text-gray-900 truncate dark:text-white">
@@ -71,5 +72,43 @@
 	</div>
 
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
+<script>
+
+	{% if workspace_id %}
+	const allEvents = (workSpaceId) => {
+		return axios
+			.get(`/${workSpaceId}/all_events`)
+			.then((response) => {
+				const htmlContent = response.data.template;
+				const contentDiv = document.getElementById("all-events");
+				contentDiv.innerHTML = htmlContent;
+			})
+			.catch((error) => {
+				console.log(error);
+			});
+	};
+
+	const chatSocket = new WebSocket(
+		'ws://'
+		+ window.location.host
+		+ '/ws/events/'
+		+ "{{ workspace_id }}"
+		+ '/'
+	);
+
+	chatSocket.onmessage = function () {
+		allEvents("{{ workspace_id }}")
+	};
+
+	chatSocket.onclose = function (e) {
+		console.error('Chat socket closed unexpectedly');
+	};
+
+	{% endif %}
+
+	allEvents("{{ workspace_id }}")
+
+</script>
 
 </html>
