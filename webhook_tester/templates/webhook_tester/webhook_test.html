@@ -4,33 +4,45 @@
 
 {% block content %}
 
-<div class="flex flex-col justify-content-end border-2 border-gray-200 rounded-lg dark:border-gray-700 p-2">
-    <div>
-        <label for="search-dropdown" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Your
-            Email</label>
-        <div class="relative w-full">
-            <input readonly type="search" id="search-dropdown"
-                class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg rounded-gray-100 rounded-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
-                placeholder="Search" value="https://{{request.get_host}}/{{current_workspace.session_id}}" required>
-            <button type="submit"
-                class="flex items-center absolute top-0 end-0 p-2.5 h-full text-sm font-medium text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
-                <svg class="w-3.5 h-3.5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
-                    viewBox="0 0 18 20">
-                    <path
-                        d="M5 9V4.13a2.96 2.96 0 0 0-1.293.749L.879 7.707A2.96 2.96 0 0 0 .13 9H5Zm11.066-9H9.829a2.98 2.98 0 0 0-2.122.879L7 1.584A.987.987 0 0 0 6.766 2h4.3A3.972 3.972 0 0 1 15 6v10h1.066A1.97 1.97 0 0 0 18 14V2a1.97 1.97 0 0 0-1.934-2Z">
-                    </path>
-                    <path
-                        d="M11.066 4H7v5a2 2 0 0 1-2 2H0v7a1.969 1.969 0 0 0 1.933 2h9.133A1.97 1.97 0 0 0 13 18V6a1.97 1.97 0 0 0-1.934-2Z">
-                    </path>
-                </svg>
-                <span class="copy-text">Copy</span>
-            </button>
-        </div>
-    </div>
-</div>
+{% include "webhook_tester/webhook_info.html" %}
 
 <div id="all-events">
-
 </div>
 
+{% endblock %}
+
+{% block script %}
+<script>
+    const allEvents = (workSpaceId) => {
+        return axios
+            .get(`/${workSpaceId}/all_events`)
+            .then((response) => {
+                const htmlContent = response.data.template;
+                const contentDiv = document.getElementById("all-events");
+                contentDiv.innerHTML = htmlContent;
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+    };
+
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/events/'
+        + "{{ workspace_id }}"
+        + '/'
+    );
+
+    chatSocket.onmessage = function () {
+        allEvents("{{ workspace_id }}")
+    };
+
+    chatSocket.onclose = function (e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+
+    allEvents("{{ workspace_id }}")
+</script>
 {% endblock %}

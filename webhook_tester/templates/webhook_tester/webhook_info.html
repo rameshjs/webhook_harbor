@@ -1,0 +1,65 @@
+<div class="flex flex-col justify-content-end border-2 border-gray-200 rounded-lg dark:border-gray-700 p-6">
+    <div class="flex justify-between mb-4">
+        <h6 class="text-lg font-bold dark:text-white"> Your Unique Webhook URL</h6>
+        <button type="button"
+            class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-2.5 me-2 mb-2 dark:bg-gray-800 dark:hover:bg-gray-700 dark:focus:ring-gray-700 dark:border-gray-700">Edit</button>
+    </div>
+    <div>
+        <label for="search-dropdown" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Your
+            Email</label>
+        <div class="relative w-full">
+            <input readonly type="search" id="search-dropdown"
+                class="block p-2.5 w-full z-20 text-sm text-gray-900 bg-gray-50 rounded-lg rounded-gray-100 rounded-2 border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:border-blue-500"
+                placeholder="Search" value="https://{{request.get_host}}/{{current_workspace.session_id}}" required>
+            <button type="submit" id="copyButton"
+                class="flex items-center absolute top-0 end-0 p-2.5 h-full text-sm font-medium text-white bg-blue-700 rounded-e-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+                <svg class="w-3.5 h-3.5 mr-2" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor"
+                    viewBox="0 0 18 20">
+                    <path
+                        d="M5 9V4.13a2.96 2.96 0 0 0-1.293.749L.879 7.707A2.96 2.96 0 0 0 .13 9H5Zm11.066-9H9.829a2.98 2.98 0 0 0-2.122.879L7 1.584A.987.987 0 0 0 6.766 2h4.3A3.972 3.972 0 0 1 15 6v10h1.066A1.97 1.97 0 0 0 18 14V2a1.97 1.97 0 0 0-1.934-2Z">
+                    </path>
+                    <path
+                        d="M11.066 4H7v5a2 2 0 0 1-2 2H0v7a1.969 1.969 0 0 0 1.933 2h9.133A1.97 1.97 0 0 0 13 18V6a1.97 1.97 0 0 0-1.934-2Z">
+                    </path>
+                </svg>
+                <span class="copy-text">Copy</span>
+            </button>
+        </div>
+        <p id="helper-text-explanation" class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+            This is the address you will use to send webhooks to.
+        </p>
+    </div>
+    <p class="mt-6 text-base font-normal text-gray-1000 dark:text-gray-400">
+    <p class="text-sm font-medium text-gray-900 truncate dark:text-white mb-2">
+        Try sending a request with cURL
+    </p>
+    <code
+        class="my-2 block p-6 bg-gray-300 border border-gray-200 rounded-lg dark:bg-gray-800 dark:border-gray-700 text-base font-normal text-gray-1000 dark:text-gray-400">
+        curl -X POST https://webhook-test.com/55a5310b5494794f323ed90d47370887
+        -H "Content-Type: application/json" -d '{"username":"xyz","password":"xyz"}'
+    </code>
+    </p>
+</div>
+
+{% block script %}
+<script>
+    $(document).ready(function () {
+        $('#copyButton').click(function () {
+            const textToCopy = $('#search-dropdown').val();
+            const copyButton = $(this);
+            const copyText = copyButton.find('.copy-text');
+
+            navigator.clipboard.writeText(textToCopy)
+                .then(() => {
+                    copyText.text('Copied');
+                    setTimeout(function () {
+                        copyText.text('Copy');
+                    }, 2000);
+                })
+                .catch((err) => {
+                    console.error('Could not copy text: ', err);
+                });
+        });
+    });
+</script>
+{% endblock %}

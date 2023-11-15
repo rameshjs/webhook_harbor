@@ -9,6 +9,7 @@
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 	{% tailwind_css %}
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.1.1/flowbite.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 </head>
 
 <body class="bg-gray-50 dark:bg-gray-900">
@@ -73,42 +74,8 @@
 
 </body>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
-<script>
+{% block script %}
 
-	{% if workspace_id %}
-	const allEvents = (workSpaceId) => {
-		return axios
-			.get(`/${workSpaceId}/all_events`)
-			.then((response) => {
-				const htmlContent = response.data.template;
-				const contentDiv = document.getElementById("all-events");
-				contentDiv.innerHTML = htmlContent;
-			})
-			.catch((error) => {
-				console.log(error);
-			});
-	};
-
-	const chatSocket = new WebSocket(
-		'ws://'
-		+ window.location.host
-		+ '/ws/events/'
-		+ "{{ workspace_id }}"
-		+ '/'
-	);
-
-	chatSocket.onmessage = function () {
-		allEvents("{{ workspace_id }}")
-	};
-
-	chatSocket.onclose = function (e) {
-		console.error('Chat socket closed unexpectedly');
-	};
-
-	{% endif %}
-
-	allEvents("{{ workspace_id }}")
-
-</script>
+{% endblock %}
 
 </html>
